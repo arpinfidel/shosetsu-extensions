@@ -1,4 +1,4 @@
--- {"id":95556,"ver":"1.0.7","libVer":"1.0.0","author":"Confident-hate"}
+-- {"id":95556,"ver":"1.0.8","libVer":"1.0.0","author":"Confident-hate"}
 local json = Require("dkjson")
 local baseURL = "https://www.wattpad.com"
 
@@ -11,7 +11,7 @@ end
 ---@param url string
 ---@param type int
 local function shrinkURL(url)
-    return url:gsub("https://www.wattpad.com", "")
+    return url:gsub(baseURL, "")
 end
 
 ---@param url string
@@ -100,7 +100,11 @@ local function search(data)
         statusValue = STATUS_PARAMS[status+1]
     end
     local query = baseURL .. "/v4/search/stories?query=" .. queryContent .. statusValue .. "&free=1&fields=stories(title,cover,url),nexturl&limit=20&mature=true&offset=" .. page*20
-    local response = RequestDocument(GET(query, HeadersBuilder():add("Cookie", "lang=1; locale=en_US;"):build(), nil))
+    local response = RequestDocument(GET(query,
+        HeadersBuilder()
+        :add("Cookie", "lang=1; locale=en_US;") -- TODO: make language configurable
+        :build())
+    )
     response = json.decode(response:text())
     return map(response["stories"], function(v)
         return Novel {
@@ -139,7 +143,7 @@ local function parseNovel(novelURL)
     end
 
     local novel = NovelInfo {
-        title = document:selectFirst(".d2amY"):text(),
+        title = document:selectFirst("title"):text(),
         description = description,
         imageURL = document:select(".cover__BlyZa"):attr("src"),
         authors = { document:selectFirst(".o94Sz"):text() },
