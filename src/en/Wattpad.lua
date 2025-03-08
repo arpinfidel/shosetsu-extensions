@@ -1,4 +1,4 @@
--- {"id":95556,"ver":"1.0.6","libVer":"1.0.0","author":"Confident-hate"}
+-- {"id":95556,"ver":"1.0.7","libVer":"1.0.0","author":"Confident-hate"}
 local json = Require("dkjson")
 local baseURL = "https://www.wattpad.com"
 
@@ -100,7 +100,7 @@ local function search(data)
         statusValue = STATUS_PARAMS[status+1]
     end
     local query = baseURL .. "/v4/search/stories?query=" .. queryContent .. statusValue .. "&free=1&fields=stories(title,cover,url),nexturl&limit=20&mature=true&offset=" .. page*20
-    local response = RequestDocument(GET(query, nil, nil))
+    local response = RequestDocument(GET(query, HeadersBuilder():add("Cookie", "lang=1; locale=en_US;"):build(), nil))
     response = json.decode(response:text())
     return map(response["stories"], function(v)
         return Novel {
